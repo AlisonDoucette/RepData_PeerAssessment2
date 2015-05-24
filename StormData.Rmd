@@ -59,7 +59,7 @@ options(rpubs.upload.method = "internal")
 + download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2","storm.csv.bz2")
 
 
-1) Unpack file to load into R dataset
+1) Unpack file to load into R dataset. Note: Going to get a cup of coffee/tea would not be a bad idea.
 
 ```{r ReadData}
 setwd( "C:/Alison/R/R Working Directory")
