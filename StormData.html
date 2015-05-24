@@ -66,6 +66,8 @@ img {
 options(RCurlOptions = list(verbose = FALSE, capath = system.file(&quot;CurlSSL&quot;, &quot;cacert.pem&quot;, package = &quot;RCurl&quot;), ssl.verifypeer = FALSE))</code></pre>
 <pre class="r"><code>library(knitr)
 opts_chunk$set(echo=TRUE, cache=FALSE)</code></pre>
+<div id="impacts-of-storms-on-people-and-property" class="section level2">
+<h2>Impacts of Storms on People and Property</h2>
 <div id="synopsis" class="section level3">
 <h3>Synopsis</h3>
 <p>An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted. The primary questions were:</p>
@@ -128,24 +130,21 @@ library(xtable)</code></pre>
 <div id="steps-followed" class="section level6">
 <h6>Steps followed:</h6>
 <ul>
-<li>Download the file and select only the relevant coluns for the analysis</li>
+<li>Download the file and select only the relevant columns for the analysis</li>
 <li>Sum the Fatalities and Injuries to total the human impact</li>
 <li>Compute the dollar impact on property and crops using damage and damage exponent columns.</li>
-<li>Sum the Property and Crop damage to total property Damage.</li>
-<li>Select top ten damage impact for Health and Property.</li>
+<li>Sum the Property and Crop damage to total property damage.</li>
+<li>Select top ten damage impacts for Health and Property.</li>
 </ul>
 <div id="note" class="section level7">
 <p>Note:</p>
-<ul>
-<li>The following is the code used to download and process the file on a local machine.</li>
-<li>Set the working directory, download the file, read in only needed columns</li>
-<li>setwd( “C:/Alison/R/R Working Directory”)</li>
-<li>download.file(“<a href="https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2">https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2</a>”,“storm.csv.bz2”)</li>
-</ul>
+<p>The following is the code used to download and process the file on a local machine. + Set the working directory, download the file, read in only needed columns:</p>
+<p>download.file(“<a href="https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2">https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2</a>”,“storm.csv.bz2”)</p>
 <ol style="list-style-type: decimal">
-<li>Unpack file to load into R dataset</li>
+<li>Unpack file to load into R dataset. Note: Going to get a cup of coffee/tea would not be a bad idea.</li>
 </ol>
-<pre class="r"><code>setwd( &quot;C:/Alison/R/R Working Directory&quot;)
+<pre class="r"><code>## download.file(&quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2&quot;,&quot;storm.csv.bz2&quot;)
+setwd( &quot;C:/Alison/R/R Working Directory&quot;)
 stormdata&lt;- read.csv(bzfile(&quot;storm.csv.bz2&quot;), header=TRUE, stringsAsFactors=FALSE)[,c(&quot;EVTYPE&quot;,&quot;FATALITIES&quot;,&quot;INJURIES&quot;,&quot;PROPDMG&quot;,&quot;PROPDMGEXP&quot;,&quot;CROPDMG&quot;,&quot;CROPDMGEXP&quot;)]</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Sum the Fatalities and Injuries to Total Health Impact</li>
@@ -289,6 +288,7 @@ top.health</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div id="section" class="section level2">
 <h2></h2>
 </div>
@@ -314,7 +314,7 @@ top.health</code></pre>
 <h2></h2>
 <div id="summaryabstract" class="section level3">
 <h3>Summary/Abstract</h3>
-<p>An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted. The most damaging econmic event was found to be FLOOD(s) and the top most damaging event ot human life/health was found to be TORNADO(s).</p>
+<p>An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted. The most damaging econmic event was found to be FLOOD(s) and the top most damaging event on human life/health was found to be TORNADO(s).</p>
 <pre class="r"><code>setwd(&quot;C:/Users/adoucette/Documents&quot;)</code></pre>
 </div>
 </div>

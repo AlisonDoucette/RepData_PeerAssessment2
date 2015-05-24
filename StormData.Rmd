@@ -13,6 +13,8 @@ options(RCurlOptions = list(verbose = FALSE, capath = system.file("CurlSSL", "ca
 library(knitr)
 opts_chunk$set(echo=TRUE, cache=FALSE)
 ```
+##Impacts of Storms on People and Property
+
 ### Synopsis
 
 An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted. The primary questions were:  
@@ -46,22 +48,23 @@ options(rpubs.upload.method = "internal")
 ```
 ####  Data Pre-Processing
 ######  Steps followed:
-* Download the file and select only the relevant coluns for the analysis
+* Download the file and select only the relevant columns for the analysis
 *  Sum the Fatalities and Injuries to total the human impact
 *  Compute the dollar impact on property and crops using damage and damage exponent columns.
-*  Sum the Property and Crop damage to total property Damage.
-*  Select top ten damage impact for Health and Property.
+*  Sum the Property and Crop damage to total property damage.
+*  Select top ten damage impacts for Health and Property.
 
-####### Note: 
-+ The following is the code used to download and process the file on a local machine.
-+ Set the working directory, download the file, read in only needed columns
-+ setwd( "C:/Alison/R/R Working Directory")
-+ download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2","storm.csv.bz2")
+####### Note:    
+The following is the code used to download and process the file on a local machine.
++ Set the working directory, download the file, read in only needed columns:
+
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2","storm.csv.bz2")
 
 
 1) Unpack file to load into R dataset. Note: Going to get a cup of coffee/tea would not be a bad idea.
 
 ```{r ReadData}
+## download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2","storm.csv.bz2")
 setwd( "C:/Alison/R/R Working Directory")
 stormdata<- read.csv(bzfile("storm.csv.bz2"), header=TRUE, stringsAsFactors=FALSE)[,c("EVTYPE","FATALITIES","INJURIES","PROPDMG","PROPDMGEXP","CROPDMG","CROPDMGEXP")]
 ```
@@ -215,7 +218,7 @@ TopProp <- top.property$Storm.Event[1]
 ##  
 ### Summary/Abstract
 
-An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted.  The most damaging econmic event was found to be `r TopProp`(s) and the top most damaging event ot human life/health was found to be `r TopHealth`(s).
+An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted.  The most damaging econmic event was found to be `r TopProp`(s) and the top most damaging event on human life/health was found to be `r TopHealth`(s).
 
 ```{r}
 setwd("C:/Users/adoucette/Documents")
