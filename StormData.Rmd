@@ -1,0 +1,222 @@
+output:
+  html_document:
+    keep_md: yes
+---
+##Impacts of Storms on People and Property
+
+```{r}
+options(rpubs.upload.method = "internal")
+options(RCurlOptions = list(verbose = FALSE, capath = system.file("CurlSSL", "cacert.pem", package = "RCurl"), ssl.verifypeer = FALSE))
+```
+
+```{r setup, echo= TRUE}
+library(knitr)
+opts_chunk$set(echo=TRUE, cache=FALSE)
+```
+### Synopsis
+
+An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted. The primary questions were:  
+
+1) Across the United States, which types of Storm events are most harmful with respect to population health?  
+
+2) Across the United States, which types of Storm events have the greatest economic consequences?
+
+#### Dataset Overview
+* The URL for the dataset is https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2
+* The documentation for the dataset can be found at: https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf
+
+#### Overview of Data Analysis
+* We looked at the EVTYPE column to determine the Event type as well as the FATALITIES and the INJURIES to understand the effect of the storm on human health.
+
+* We looked at the PROPDAMAGE as well we the PROPEMGEXP (explains currency level ex: K=1000)as well as the CROPDMG and CROPDMGEXP to determine the effect of the storm event on the economy.
+
+* We then computed the top 10 storm impacts on the health by a sum of fatalities and injuries and the economy as measured by property and crop damage.
+
+### Data Processing  
+The following libraries were loaded:
+```{r libraries}
+library(data.table)
+library(dplyr)
+library(plyr)
+library(ggplot2)
+library(xtable)
+```
+```{r}
+options(rpubs.upload.method = "internal")
+```
+####  Data Pre-Processing
+######  Steps followed:
+* Download the file and select only the relevant coluns for the analysis
+*  Sum the Fatalities and Injuries to total the human impact
+*  Compute the dollar impact on property and crops using damage and damage exponent columns.
+*  Sum the Property and Crop damage to total property Damage.
+*  Select top ten damage impact for Health and Property.
+
+####### Note: 
++ The following is the code used to download and process the file on a local machine.
++ Set the working directory, download the file, read in only needed columns
++ setwd( "C:/Alison/R/R Working Directory")
++ download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2","storm.csv.bz2")
+
+
+1) Unpack file to load into R dataset
+
+```{r ReadData}
+setwd( "C:/Alison/R/R Working Directory")
+stormdata<- read.csv(bzfile("storm.csv.bz2"), header=TRUE, stringsAsFactors=FALSE)[,c("EVTYPE","FATALITIES","INJURIES","PROPDMG","PROPDMGEXP","CROPDMG","CROPDMGEXP")]
+```
+
+
+2) Sum the Fatalities and Injuries to Total Health Impact
+```{r}
+storm.data <- mutate(stormdata,Health = FATALITIES + INJURIES)
+```
+3) Determine the exponents to convert  
+
+```{r findunique}
+unique(storm.data$PROPDMGEXP)
+rm(stormdata)
+```
+4) Transform the character values to numbers.
+```{r transform}
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "H"] <- 100
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "K"] <- 1000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "M"] <- 1000000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "B"] <- 1000000000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "h"] <- 100
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "m"] <- 1000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "b"] <- 1000000000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == ""] <- 1
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "?"] <- 1
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "-"] <- 1
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "+"] <- 1
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "2"] <- 100
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "3"] <- 1000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "4"] <- 10000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "5"] <- 100000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "6"] <- 1000000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "7"] <- 10000000
+storm.data$PROPDMGEXP[storm.data$PROPDMGEXP == "8"] <- 100000000
+
+## Repeat for CROPDMGEXP
+
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "H"] <- 100
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "K"] <- 1000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "M"] <- 1000000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "B"] <- 1000000000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "h"] <- 100
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "m"] <- 1000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "b"] <- 1000000000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == ""] <- 1
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "?"] <- 1
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "-"] <- 1
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "+"] <- 1
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "2"] <- 100
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "3"] <- 1000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "4"] <- 10000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "5"] <- 100000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "6"] <- 1000000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "7"] <- 10000000
+storm.data$CROPDMGEXP[storm.data$CROPDMGEXP == "8"] <- 100000000
+storm.data$CROPDMGEXP[is.na(storm.data$CROPDMGEXP)] <- 0
+
+```
+5) Clean up all the missing values (NA) and convert the test numbers to numeric fields to allow for calculations.
+
+```{r cleanup}
+##  Set to numeric, set NAs to 0
+storm.data$CROPDMGEXP <-as.numeric(storm.data$CROPDMGEXP)
+storm.data$PROPDMGEXP <-as.numeric(storm.data$PROPDMGEXP)
+storm.data$CROPDMGEXP[is.na(storm.data$CROPDMGEXP)] <- 0
+storm.data$PROPDMG[is.na(storm.data$PROPDMGEXP)] <- 0
+storm.data$CROPDMG <-as.numeric(storm.data$CROPDMG)
+storm.data$PROPDMG<-as.numeric(storm.data$PROPDMG)
+storm.data$CROPDMG[is.na(storm.data$CROPDMG)] <- 0
+storm.data$PROPDMG[is.na(storm.data$PROPDMG)] <- 0
+```
+
+6) Summarize the data and set the dollar values to millions.
+```{r calculate}
+## Create new calculated columns for Property and Crop Damage and Total Economic Damage
+storm.data <- mutate(storm.data,Prop.Damage =  PROPDMGEXP * PROPDMG)
+storm.data <- mutate(storm.data,Crop.Damage =  CROPDMGEXP * CROPDMG)
+storm.data <- mutate(storm.data,Total.Damage = Prop.Damage + Crop.Damage)
+storm.data.prop <- ddply(storm.data, "EVTYPE", summarise, Total.Damage = sum(Total.Damage))
+storm.data.prop.mill <- mutate(storm.data.prop, Total.Dollars = Total.Damage / 100000000)
+storm.data.health <- ddply(storm.data, "EVTYPE", summarise, Health = sum(Health))
+
+rm(storm.data)
+```
+### Results
+
+7) Find the Top 10 Storm Data for Property.
+```{r toptenprop}
+storm.data.prop.mill <-storm.data.prop.mill[rev(order(storm.data.prop.mill$Total.Dollar)),]
+top.property <-head(storm.data.prop.mill,10)
+colnames(top.property) <- c("Storm.Event", "Total.Dollars", "Total.Dollars.Millions")
+top.property
+```
+8) Find the Top 10 Storm Data for Health.  
+   
+   
+```{r toptenhealth}
+storm.data.health <-storm.data.health[rev(order(storm.data.health$Health)),]
+top.health <-head(storm.data.health,10)
+colnames(top.health) <- c("Storm.Event", "Persons.Impacted")
+top.health
+rm(storm.data.prop)
+```
+  
+
+  
+  
+
+#### Plots
+1) Plot  the Storm Damage for Health Impact
+```{r plothealth}
+## Plot the Storm Damage for Health
+    par(mar = c(5,4,1,1),las=1)
+    ggplot(data=top.health, aes(x=Storm.Event, y=Persons.Impacted)) +
+    geom_bar(stat="identity",fill="steelblue4") +
+    labs(x= "Storm Event Type") +
+    labs(y= "Total Injuries and Fatalities(People)") +
+    labs(title= "Top 10 Storm Events by Health Impact") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+```{r}
+TopHealth <- top.health$Storm.Event[1]
+```
+#####  The most serious storm damage on human health as computed by summing the total fatalities and injuries is caused by `r TopHealth`.  
+
+##
+##
+
+
+
+2) Plot the Storm Damage for Property Impact
+```{r plotproperty}
+    par(mar = c(5,4,1,2),las=1)
+    ggplot(data=top.property, aes(x=Storm.Event, y=Total.Dollars.Millions)) +
+    geom_bar(stat="identity",fill="steelblue4") +
+    labs(x= "Storm Event Type") +
+    labs(y= "Total Dollar Impact(Million $)") +
+    labs(title= "Top 10 Storm Events by Property and Crop Damage Impact") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+
+```
+
+```{r toppropevent}
+TopProp <- top.property$Storm.Event[1]
+```
+#####  The most serious storm damage on human health as computed by summing the total property and crop damage is caused by `r TopProp`.   
+##  
+### Summary/Abstract
+
+An analysis was done of the NOAA Storm Event dataset, the top ten most damaging events for the economy (property and crops) and human health were computed and plotted.  The most damaging econmic event was found to be `r TopProp`(s) and the top most damaging event ot human life/health was found to be `r TopHealth`(s).
+
+```{r}
+setwd("C:/Users/adoucette/Documents")
+```
